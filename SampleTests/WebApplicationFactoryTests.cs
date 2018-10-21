@@ -1,22 +1,27 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using SampleApi;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace SampleTests
 {
-    public class WebApplicationFactoryTests
+    public class WebApplicationFactoryTests : IDisposable
     {
+        private readonly WebApplicationFactory<Startup> _factory;
+
+        public WebApplicationFactoryTests()
+        {
+            Startup.NumberOfCalls = 0;
+            _factory = new WebApplicationFactory<Startup>();
+        }
+
         [Fact]
         public void WebApplicationFactory_should_initialize_Api_once()
         {
-            Startup.NumberOfCalls = 0;
-
-            var factory = new WebApplicationFactory<Startup>();
-
             for (int i = 0; i < 10; ++i)
-                factory.CreateDefaultClient();
+                _factory.CreateDefaultClient();
 
             // This looks ok, the server is initialized once
             Assert.Equal(1, Startup.NumberOfCalls);
@@ -25,12 +30,8 @@ namespace SampleTests
         [Fact]
         public async Task WebApplicationFactory_Api_initialization_should_be_thread_safe()
         {
-            Startup.NumberOfCalls = 0;
-
-            var factory = new WebApplicationFactory<Startup>();
-
             // Requesting HttpClients in multiple tasks should end up in one TestServer instance creation
-            await Task.WhenAll(Enumerable.Range(0, 10).Select(_ => Task.Run(() => factory.CreateDefaultClient())));
+            await Task.WhenAll(Enumerable.Range(0, 10).Select(_ => Task.Run(() => _factory.CreateDefaultClient())));
 
             // But it is not...
             Assert.Equal(1, Startup.NumberOfCalls);
@@ -41,6 +42,11 @@ namespace SampleTests
         {
             // How to initialize it then explicitly?
             Assert.NotNull(new WebApplicationFactory<Startup>().Server);
+        }
+
+        public void Dispose()
+        {
+            _factory?.Dispose();
         }
     }
 }
