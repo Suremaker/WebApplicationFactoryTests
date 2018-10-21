@@ -1,4 +1,4 @@
-The project shows thread-safety issues with `WebApplicationFactory<T>`.
+The project shows thread-safety issues with `WebApplicationFactory<T>` (reported here [8629](https://github.com/aspnet/Mvc/issues/8629)).
 
 According to the [documentation](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.testing.webapplicationfactory-1.-ctor?view=aspnetcore-2.1#Microsoft_AspNetCore_Mvc_Testing_WebApplicationFactory_1__ctor), the `WebApplicationFactory<T>` is used to create the instance of the `TestServer` and one or more instances of `HttpClient` that can be used in the test.
 
