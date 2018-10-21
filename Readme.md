@@ -1,0 +1,1 @@
+The project shows thread-safety issues with `WebApplicationFactory<T>`.
